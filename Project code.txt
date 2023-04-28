@@ -1,0 +1,61 @@
+#include <Wire.h>
+#include "Keyboard.h"
+
+#define MPU6050_ADDRESS 0x68   // I2C address of MPU6050 sensor
+#define MPU6050_ACCEL_XOUT_H 0x3B   // accelerometer X-axis high byte register address
+
+int16_t accelerometer_x, accelerometer_y, accelerometer_z;   // variables to store accelerometer data
+
+void setup() {
+  Serial.begin(9600);
+  Wire.begin();   // initialize I2C bus
+  //delay(100);
+
+  // Configure MPU6050 sensor
+  Wire.beginTransmission(MPU6050_ADDRESS);
+  Wire.write(0x6B);   // power management register
+  Wire.write(0x00);   // activate the sensor
+  Wire.endTransmission();
+
+  Keyboard.begin();
+}
+
+void loop() {
+  // Read accelerometer data
+  Wire.beginTransmission(MPU6050_ADDRESS);
+  //Wire.write(MPU6050_ACCEL_XOUT_H);
+  //Wire.endTransmission(false);
+  //Wire.requestFrom(MPU6050_ADDRESS, 6, true);
+  accelerometer_x = Wire.read() << 8 | Wire.read();
+  accelerometer_y = Wire.read() << 8 | Wire.read();
+  accelerometer_z = Wire.read() << 8 | Wire.read();
+
+  float x= accelerometer_x*0.3;
+  int flex1 = analogRead(A0);
+  int flex2 = analogRead(A1);
+
+  // Print acceleration data
+  Serial.print("accelerometer_x = ");
+  Serial.print(x);
+  Serial.print(", accelerometer_y = ");
+  Serial.print(accelerometer_y*0.3);
+  Serial.print(", accelerometer_z = ");
+  Serial.println(accelerometer_z*0.3);///////////////////
+  Serial.print(", Flex 1 = ");
+  Serial.println(flex1);
+  Serial.print(", Flex 2 = ");
+  Serial.println(flex2);
+  
+  if (x <= -2000){
+    Keyboard.press('S');
+    delay(250);
+    Keyboard.releaseAll();
+  }
+  else if (x >= 2000){
+    Keyboard.press('W');
+    delay(250);
+    Keyboard.releaseAll();
+  }
+
+delay(1000);
+}

@@ -23,14 +23,15 @@ void setup() {
 void loop() {
   // Read accelerometer data
   Wire.beginTransmission(MPU6050_ADDRESS);
-  //Wire.write(MPU6050_ACCEL_XOUT_H);
-  //Wire.endTransmission(false);
-  //Wire.requestFrom(MPU6050_ADDRESS, 6, true);
+  Wire.write(MPU6050_ACCEL_XOUT_H);
+  Wire.endTransmission(false);
+  Wire.requestFrom(MPU6050_ADDRESS, 6, true);
   accelerometer_x = Wire.read() << 8 | Wire.read();
   accelerometer_y = Wire.read() << 8 | Wire.read();
   accelerometer_z = Wire.read() << 8 | Wire.read();
 
   float x= accelerometer_x*0.3;
+  float y= accelerometer_y*0.3;  
   int flex1 = analogRead(A0);
   int flex2 = analogRead(A1);
 
@@ -38,24 +39,43 @@ void loop() {
   Serial.print("accelerometer_x = ");
   Serial.print(x);
   Serial.print(", accelerometer_y = ");
-  Serial.print(accelerometer_y*0.3);
-  Serial.print(", accelerometer_z = ");
-  Serial.println(accelerometer_z*0.3);///////////////////
+  Serial.print(y);
   Serial.print(", Flex 1 = ");
-  Serial.println(flex1);
+  Serial.println(flex1); 
   Serial.print(", Flex 2 = ");
-  Serial.println(flex2);
+  Serial.println(flex2*10);
   
   if (x <= -2000){
-    Keyboard.press('S');
+    Keyboard.press('A');
     delay(250);
     Keyboard.releaseAll();
   }
   else if (x >= 2000){
+    Keyboard.press('D');
+    delay(250);
+    Keyboard.releaseAll();
+  }
+  if (y <= -1500){
+    Keyboard.press('S');
+    delay(250);
+    Keyboard.releaseAll();
+  }
+  else if (y >= 1500){
     Keyboard.press('W');
     delay(250);
     Keyboard.releaseAll();
   }
+  //flex 1
+  if (flex1 < 500){
+    Keyboard.press('L');
+    delay(250);
+    Keyboard.releaseAll();
+  }
+  if (flex2 >= 4700){
+    Keyboard.press('k');
+    delay(250);
+    Keyboard.releaseAll();
+  }
 
-delay(1000);
+//delay(500);
 }
